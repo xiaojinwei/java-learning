@@ -90,18 +90,18 @@ public class BSTMap<K, V> implements BSTTreeMap<K,V>, Iterable<BSTMap.BSTEntry<K
      * @return
      */
     private BSTEntry<K,V> getEntry(Object key) {
-        BSTEntry<K,V> p = root;
+        BSTEntry<K,V> p = root;//初始化指针p,指向根节点
         while (p != null) {
-            int cmp = compare(key, p.key);
+            int cmp = compare(key, p.key);//比较key与p.key的大小
             if (cmp < 0) {
-                p = p.left;
+                p = p.left;//key小于p.key，递归(循环)查找左子树
             } else if (cmp > 0) {
-                p = p.right;
+                p = p.right;//key大于p.key，递归(循环)查找右子树
             } else {
-                return p;
+                return p;//key等于p.key，查找成功
             }
         }
-        return null;
+        return null;//查找失败
     }
 
     @Override
@@ -119,6 +119,7 @@ public class BSTMap<K, V> implements BSTTreeMap<K,V>, Iterable<BSTMap.BSTEntry<K
     /**
      * 遍历所有结点查看比较value
      * 这里直接使用的迭代器，一个一个比较(中序遍历)
+     * 时间复杂度O(N)
      * @param value
      * @return
      */

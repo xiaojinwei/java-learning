@@ -370,6 +370,38 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
         root = p;//重新设置根节点
      }
 
+    /**
+     * 删除调整
+     * 1,类似插入，假设删除了p右子树的某个结点，引起了p的平衡因子d[p]=2，分析p的左子树left，三种情况如下：
+     *     情况1：left的平衡因子d[left]=1，将p右旋
+     *     情况2：left的平衡因子d[left]=0，将p右旋
+     *     情况3：left的平衡因子d[left]=-1，先左旋left，再右旋p
+     * 2,删除左子树，即d[p]=-2的情况，与d[p]=2对称
+     * @param p
+     * @return
+     */
+    private AVLEntry<K, V> fixAfterDeletion(AVLEntry<K, V> p) {
+        if (p == null) return null;
+        else{
+            p.height = Math.max(getHeight(p.left),getHeight(p.right)) + 1;
+            int d = getHeight(p.left) - getHeight(p.right);
+            if (d == 2) { //说明p.left一定不为null
+                if (getHeight(p.left.left) - getHeight(p.left.right) >= 0) {
+                    p = rotateRight(p);
+                }else{
+                    p = firstLeftThenRight(p);
+                }
+            } else if (d == -2) {//说明p.right一定不为null
+                if (getHeight(p.right.right) - getHeight(p.right.left) >= 0) {
+                    p = rotateLeft(p);
+                }else{
+                    p = firstRightThenLeft(p);
+                }
+            }
+            return p;
+        }
+    }
+
 
     //Entry
     //***************************************************************
