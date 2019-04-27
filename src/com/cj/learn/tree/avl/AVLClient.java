@@ -8,9 +8,82 @@ import java.util.TreeMap;
 public class AVLClient {
 
     static Random random = new Random();
+    static int MAX = 20480;
     public static void main(String[] args) {
         //testGet();
-        testRemove();
+        //testRemove();
+        //testPut();
+        //testPutExample();
+        testAVLRandom();
+        testTreeMapRandom();
+        testAVLIncrement();
+        testTreeMapIncrement();
+    }
+
+    private static void testPutExample(){
+        AVLMap<Integer,String> map = new AVLMap<>();
+        for (int i = 0; i < 100; i++) {
+            map.put(i,"abc" + i);
+        }
+        for (int i = 0; i < 10; i++) {
+            System.out.println(map.get(random.nextInt(100)));
+        }
+    }
+
+    private static void testAVLRandom() {
+        long start = System.currentTimeMillis();
+        AVLMap<Integer,String> map = new AVLMap<>();
+        for (int i = 0; i < MAX; i++) {
+            map.put(random.nextInt(MAX),String.valueOf(random.nextInt(MAX)));
+        }
+        boolean b = map.checkBalance();
+        System.out.println("testAVLRandom checkBalance : " + b);
+        for (int i = 0; i < MAX; i++) {
+            map.get(random.nextInt(MAX));
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("testAVLRandom use time : " + (end - start) + " ms");
+    }
+
+    private static void testTreeMapRandom() {
+        long start = System.currentTimeMillis();
+        TreeMap<Integer,String> map = new TreeMap<>();
+        for (int i = 0; i < MAX; i++) {
+            map.put(random.nextInt(MAX),random.nextInt(MAX) + "");
+        }
+        for (int i = 0; i < MAX; i++) {
+            map.get(random.nextInt(MAX));
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("testTreeMapRandom use time : " + (end - start) + " ms");
+    }
+
+    private static void testAVLIncrement() {
+        long start = System.currentTimeMillis();
+        AVLMap<Integer,String> map = new AVLMap<>();
+        for (int i = 0; i < MAX; i++) {
+            map.put(i,random.nextInt(MAX) + "");
+        }
+        boolean b = map.checkBalance();
+        System.out.println("testAVLRandom testAVLIncrement : " + b);
+        for (int i = 0; i < MAX; i++) {
+            map.get(random.nextInt(MAX));
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("testAVLIncrement use time : " + (end - start) + " ms");
+    }
+
+    private static void testTreeMapIncrement() {
+        long start = System.currentTimeMillis();
+        TreeMap<Integer,String> map = new TreeMap<>();
+        for (int i = 0; i < MAX; i++) {
+            map.put(i,random.nextInt(MAX) + "");
+        }
+        for (int i = 0; i < MAX; i++) {
+            map.get(random.nextInt(MAX));
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("testTreeMapIncrement use time : " + (end - start) + " ms");
     }
 
     private static void testRemove() {
@@ -44,7 +117,7 @@ public class AVLClient {
     public static void testPut() {
         AVLMap<Integer, String> map1 = new AVLMap<>();
         TreeMap<Integer, String> map2 = new TreeMap<>();
-        for (int i = 0; i < 65535; i++) {
+        for (int i = 0; i < 65; i++) {
             int key = random.nextInt(65535);
             String value = random.nextInt(65535) + "";
             map1.put(key,value);

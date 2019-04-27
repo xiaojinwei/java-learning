@@ -51,8 +51,8 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
                 if (cmp < 0) {
                     if (p.left == null) {
                         p.left = new AVLEntry<K,V>(key,value);
-                        stack.push(p.left);//需要将put走的路径全部压栈，为了fixAfterInsertion实现平衡
                         size ++;
+                        stack.push(p.left);//需要将put走的路径全部压栈，为了fixAfterInsertion实现平衡
                         break;
                     }else{
                         p = p.left;//再次循环比较
@@ -60,8 +60,8 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
                 } else if (cmp > 0) {
                     if (p.right == null) {
                         p.right = new AVLEntry<K,V>(key,value);
-                        stack.push(p.right);//需要将put走的路径全部压栈，为了fixAfterInsertion实现平衡
                         size ++;
+                        stack.push(p.right);//需要将put走的路径全部压栈，为了fixAfterInsertion实现平衡
                         break;
                     }else{
                         p = p.right;
@@ -214,6 +214,7 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
             AVLEntry<K, V> newRight = deleteEntry(p.right, key);//以右子树为根结点，递归重新找要删除的结点
             p.right = newRight;//实现真正的删除功能(如果p.rigth是要删除的结点，并且p.right结点没有子节点了，那么newRight必定返回null，也就实现了删除功能)
         }
+        p = fixAfterDeletion(p);
         return p;
     }
 
@@ -278,7 +279,7 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
      */
     private AVLEntry<K,V> rotateRight(AVLEntry<K,V> p) {
         AVLEntry<K,V> left = p.left;
-        p.right = left.right;
+        p.left = left.right;
         left.right = p;
         p.height = Math.max(getHeight(p.left),getHeight(p.right)) + 1;
         left.height = Math.max(getHeight(left.left),p.height) + 1;
@@ -330,18 +331,18 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
     private void fixAfterInsertion(K key){
         AVLEntry<K,V> p = root;
         while (!stack.isEmpty()) {
-            p = stack.pop();
+            p = stack.pop();//插入所走的路径不断弹栈
             //优化
             //**************************************************************
             int newHeight = Math.max(getHeight(p.left),getHeight(p.right)) + 1;
-            if (p.height > 1 /*保证p不是叶子节点*/ && newHeight == p.height) {
+            if (p.height > 1 /*保证p不是叶子节点*/ && newHeight == p.height/*高度没有改变*/) {
                 stack.clear();
                 return;
             }
             //**************************************************************
             p.height = newHeight;//Math.max(getHeight(p.left),getHeight(p.right)) + 1;
-            int d = getHeight(p.left) - getHeight(p.right);
-            if (Math.abs(d) <= 1) {
+            int d = getHeight(p.left) - getHeight(p.right);//计算平衡因子
+            if (Math.abs(d) <= 1) { //改树平衡无需调整(旋转)
                 continue;
             }else{
                 if (d == 2) {
@@ -371,12 +372,39 @@ public class AVLMap<K, V> implements Iterable<AVLMap.AVLEntry<K,V>>{
      }
 
     /**
+     * 辅助函数，检测整棵树是否是平衡的
+     * 使用后序遍历算法实现
+     */
+    public boolean checkBalance() {
+        return postOrderCheckBalance(root);
+     }
+
+    /**
+     * 后续遍历检测树时候平衡
+     * 每个子树平衡，改树才是平衡的
+     * 自底向上检测
+     * @param p
+     * @return
+     */
+     private boolean postOrderCheckBalance(AVLEntry<K,V> p) {
+         if (p != null) {
+             boolean l = postOrderCheckBalance(p.left);//递归检测左子树
+             boolean r = postOrderCheckBalance(p.right);//递推检测右子树
+             boolean b = Math.abs(getHeight(p.left) - getHeight(p.right)) <= 1;//检测节点p本身
+             return l && r && b;
+         }
+         return true;
+     }
+
+    /**
      * 删除调整
      * 1,类似插入，假设删除了p右子树的某个结点，引起了p的平衡因子d[p]=2，分析p的左子树left，三种情况如下：
      *     情况1：left的平衡因子d[left]=1，将p右旋
      *     情况2：left的平衡因子d[left]=0，将p右旋
      *     情况3：left的平衡因子d[left]=-1，先左旋left，再右旋p
      * 2,删除左子树，即d[p]=-2的情况，与d[p]=2对称
+     *
+     * 删除算法是递归的，所以该方法是在递归中调用的
      * @param p
      * @return
      */
