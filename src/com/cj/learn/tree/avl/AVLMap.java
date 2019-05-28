@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * 功能相似于TreeMap
- * 该实现原理使用的是二叉排序树
+ * 该实现原理使用的是AVL算法
  * @param <K>
  * @param <V>
  */
